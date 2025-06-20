@@ -1,18 +1,15 @@
+import random
 import re
 
-def clean_caption(original_caption):
-    # Remove @mewsinsta or similar mentions and replace with your handle
-    modified_caption = re.sub(r"@\w+", "@newswire.in", original_caption)
+VIRAL_HASHTAGS = [
+    "#trending", "#news", "#breaking", "#viral", "#reels", "#dailyupdate", "#instadaily",
+    "#foryou", "#explorepage", "#todaynews", "#india", "#update", "#instanews"
+]
 
-    # Add hashtags
-    hashtags = [
-        "#breakingnews", "#latestnews", "#trendingnow", "#indianews", "#reels", "#viral",
-        "#newsupdate", "#headlines", "#instagramreels", "#tufaanexpress", "#news", "#updates",
-        "#dailynews", "#media", "#journalism"
-    ]
-    hashtag_text = " ".join(hashtags)
-
-    final_caption = f"""{modified_caption}
-
-{hashtag_text}"""
+def format_caption(original_caption, old_username="@mewsinsta", new_username="@newswire.in"):
+    modified_caption = re.sub(re.escape(old_username), new_username, original_caption, flags=re.IGNORECASE)
+    modified_caption = modified_caption.strip()
+    selected_tags = random.sample(VIRAL_HASHTAGS, 10)
+    hashtags = " ".join(selected_tags)
+    final_caption = f"{modified_caption}\n{hashtags}" # Changed here
     return final_caption

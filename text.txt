@@ -1,9 +1,0 @@
-# Telegram Bot Config
-BOT_TOKEN=7721274366:AAGK_i6rXw_ha-9Vkhs8JMDOvUlPGNz79_Q
-OWNER_ID=5889093912
-
-# Instagram Cookie Session
-IG_COOKIES=csrftoken=YOUR_COOKIE; ds_user_id=YOUR_USER_ID; mid=YOUR_MID; ig_nrcb=1;
-
-# Telegram Channel
-CHANNEL_ID=-1002788895761

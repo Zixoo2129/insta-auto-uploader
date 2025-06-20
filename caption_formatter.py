@@ -19,7 +19,7 @@ def format_caption(original_caption, old_username="@mewsinsta", new_username="@n
     hashtags = " ".join(selected_tags)
 
     # Final caption
-    final_caption = f"{modified_caption}
+    final_caption = f"{modified_caption}"
 
 {hashtags}"
     return final_caption

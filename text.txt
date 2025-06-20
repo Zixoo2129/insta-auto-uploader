@@ -1,0 +1,32 @@
+import os
+from dotenv import load_dotenv
+from reel_uploader import upload_reel
+from instagram_upload import upload_image
+from caption_formatter import clean_caption
+from watermark_handler import process_media
+
+load_dotenv()
+
+# Sample: local path and caption
+def handle_post(file_path, caption, is_reel=False, cover_path=None):
+    print(f"[📦] Handling {'Reel' if is_reel else 'Image'} Upload...")
+
+    # Step 1: Clean caption (replace @mewsinsta, add hashtags, etc.)
+    final_caption = clean_caption(caption)
+
+    # Step 2: Apply watermark blur/overlay
+    processed_file = process_media(file_path)
+
+    # Step 3: Upload to Instagram
+    if is_reel:
+        upload_reel(processed_file, final_caption, cover_path)
+    else:
+        upload_image(processed_file, final_caption)
+
+# ----------- TEST RUN -------------
+if __name__ == "__main__":
+    # IMAGE POST EXAMPLE
+    handle_post("downloads/sample.jpg", "Follow @mewsinsta for more!")
+
+    # REEL POST EXAMPLE (optional cover)
+    # handle_post("downloads/reel.mp4", "🔥 Hot news reel!", is_reel=True, cover_path="downloads/cover.jpg")

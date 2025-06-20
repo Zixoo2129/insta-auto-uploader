@@ -1,34 +1,54 @@
 import cv2
 import numpy as np
+import os
 
-def detect_and_blur_watermark(image_path, output_path, overlay_logo_path=None):
-    img = cv2.imread(image_path)
+# Load your watermark image
+WATERMARK_PATH = "your_watermark.png"  # make sure this file exists in your project
 
-    # Convert to grayscale for detection
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def overlay_watermark(base_image_path, save_path):
+    try:
+        image = cv2.imread(base_image_path)
+        watermark = cv2.imread(WATERMARK_PATH, cv2.IMREAD_UNCHANGED)
 
-    # Basic watermark detection using thresholding
-    _, thresh = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
+        if image is None or watermark is None:
+            print("Error loading image or watermark.")
+            return base_image_path  # fallback
 
-    # Find contours of bright areas (likely watermark text/logos)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        (h_img, w_img) = image.shape[:2]
+        (h_wm, w_wm) = watermark.shape[:2]
 
-    for cnt in contours:
-        x, y, w, h = cv2.boundingRect(cnt)
-        # Apply blur only if contour area is large enough
-        if w * h > 150:
-            roi = img[y:y+h, x:x+w]
-            blurred = cv2.GaussianBlur(roi, (23, 23), 30)
-            img[y:y+h, x:x+w] = blurred
+        # Resize watermark to 1/5 of image width
+        scale = w_img // 5
+        scale_ratio = scale / w_wm
+        new_w = int(w_wm * scale_ratio)
+        new_h = int(h_wm * scale_ratio)
+        watermark = cv2.resize(watermark, (new_w, new_h))
 
-    # Optional overlay (your logo)
-    if overlay_logo_path:
-        logo = cv2.imread(overlay_logo_path, cv2.IMREAD_UNCHANGED)
-        if logo is not None:
-            logo = cv2.resize(logo, (100, 100))
-            y_offset, x_offset = 10, img.shape[1] - 110
-            for c in range(3):
-                img[y_offset:y_offset+logo.shape[0], x_offset:x_offset+logo.shape[1], c] = logo[:, :, c]
+        # Position: top-right corner
+        x_offset = w_img - new_w - 10
+        y_offset = 10
 
-    # Save output
-    cv2.imwrite(output_path, img)
+        # Overlay watermark
+        overlay = image.copy()
+
+        for c in range(0, 3):  # for each color channel
+            overlay[y_offset:y_offset+new_h, x_offset:x_offset+new_w, c] = \
+                watermark[:, :, c] * (watermark[:, :, 3] / 255.0) + \
+                overlay[y_offset:y_offset+new_h, x_offset:x_offset+new_w, c] * (1.0 - watermark[:, :, 3] / 255.0)
+
+        cv2.imwrite(save_path, overlay)
+        return save_path
+
+    except Exception as e:
+        print(f"Error during watermarking: {e}")
+        return base_image_path
+
+
+def process_media(input_path):
+    # Generate output filename
+    base, ext = os.path.splitext(input_path)
+    output_path = base + "_processed" + ext
+
+    # Apply overlay
+    result_path = overlay_watermark(input_path, output_path)
+    return result_path

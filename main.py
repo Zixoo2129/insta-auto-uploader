@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from reel_uploader import upload_reel
-from instagram_upload import upload_image
+from instagram_upload import upload_photo
 from caption_formatter import clean_caption
 from watermark_handler import process_media
 

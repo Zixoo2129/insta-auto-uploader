@@ -1,32 +1,31 @@
 import os
 from dotenv import load_dotenv
-from reel_uploader import upload_reel
-from instagram_upload import upload_photo_to_instagram
+from telegram_bot import start_bot
 from caption_formatter import clean_caption
 from watermark_handler import process_media
+from instagram_upload import upload_photo_to_instagram
 
 load_dotenv()
 
-# Sample: local path and caption
-def handle_post(file_path, caption, is_reel=False, cover_path=None):
-    print(f"[📦] Handling {'Reel' if is_reel else 'Image'} Upload...")
+# Set your watermark and test image here
+WATERMARK_PATH = "your_watermark.png"
+TEST_IMAGE_PATH = "downloads/sample.jpg"
+TEST_CAPTION = "Follow @mewsinsta for more!"
 
-    # Step 1: Clean caption (replace @mewsinsta, add hashtags, etc.)
+def handle_post(media_path, caption):
+    print("[📦] Handling Image Upload...")
+
+    processed_file = process_media(media_path, WATERMARK_PATH)
     final_caption = clean_caption(caption)
+    upload_photo_to_instagram(processed_file, final_caption)
 
-    # Step 2: Apply watermark blur/overlay
-    processed_file = process_media(file_path)
-
-    # Step 3: Upload to Instagram
-    if is_reel:
-        upload_reel(processed_file, final_caption, cover_path)
-    else:
-        upload_image(processed_file, final_caption)
-
-# ----------- TEST RUN -------------
 if __name__ == "__main__":
-    # IMAGE POST EXAMPLE
-    handle_post("downloads/sample.jpg", "Follow @mewsinsta for more!")
+    try:
+        # TEST RUN – Remove or replace when using live Telegram flow
+        handle_post(TEST_IMAGE_PATH, TEST_CAPTION)
 
-    # REEL POST EXAMPLE (optional cover)
-    # handle_post("downloads/reel.mp4", "🔥 Hot news reel!", is_reel=True, cover_path="downloads/cover.jpg")
+        # Start Telegram Bot
+        print("[🤖] Starting Telegram Bot...")
+        start_bot()
+    except Exception as e:
+        print(f"[❌] Error in main: {e}")

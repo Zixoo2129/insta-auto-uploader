@@ -37,4 +37,3 @@ def upload_photo_to_instagram(image_path, caption):
         print(f"Error: Image file not found at {image_path}")
         return False
 
-
